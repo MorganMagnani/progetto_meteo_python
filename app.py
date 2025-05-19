@@ -120,5 +120,7 @@ def pulisci():
         print(e)
         return jsonify({"error": "Errore durante la cancellazione"}), 500
 
+#non riesco ad apportare modifiche
+
 if __name__ == '__main__':
     app.run(debug=True)
