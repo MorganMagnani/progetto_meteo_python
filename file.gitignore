@@ -1,0 +1,14 @@
+# Ambiente virtuale
+.venv/
+
+# Cache e temporanei
+_pycache_/
+*.pyc
+*.log
+
+# Configurazioni IDE
+.idea/
+
+# Altri file inutitli
+*.db
+.env

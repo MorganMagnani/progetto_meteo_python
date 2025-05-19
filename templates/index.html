@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteo Live</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<h1>Consulta il meteo attuale</h1>
+<form id="meteoForm">
+    <input type="text" id="city" name="city" placeholder="Inserisci una città" required />
+    <button type="submit">Invia</button>
+    <button type="button" id="pulisci">Pulisci cronologia</button>
+</form>
+
+<div id="risultato"></div>
+<h2>Ultime ricerche</h2>
+<ul id="storico"></ul>
+
+<script>
+    document.getElementById('meteoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const city = document.getElementById('city').value;
+
+        const res = await fetch('/meteo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ city })
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+            document.getElementById('risultato').innerText = data.error;
+            return;
+        }
+
+        document.getElementById('risultato').innerHTML = `
+        <p><strong>${data.citta}</strong></p>
+        <p>🌡️ Temperatura: ${data.temperatura}°C</p>
+        <p>💨 Vento: ${data.vento} km/h</p>
+        <p>⛅ Condizioni: ${data.meteo}</p>
+      `;
+
+        const storico = document.getElementById('storico');
+        storico.innerHTML = '';
+        data.ricerche.forEach(r => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+          <strong>📍 ${r.citta}</strong><br>
+          🕒 ${new Date(r.data).toLocaleString('it-IT')}<br>
+          🌡️ ${r.temperatura}°C
+        `;
+            storico.appendChild(li);
+        });
+    });
+
+    document.getElementById('pulisci').addEventListener('click', async () => {
+        await fetch('/pulisci', { method: 'POST' });
+        document.getElementById('storico').innerHTML = '';
+    });
+</script>
+</body>
+</html>
